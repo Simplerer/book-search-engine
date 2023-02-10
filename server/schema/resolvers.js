@@ -1,3 +1,4 @@
+const { saveBook } = require('../controllers/user-controller');
 const { User } = require('../models');
 const { signToken } = require('../utils/auth');
 
@@ -8,25 +9,26 @@ const resolvers = {
       const foundUser = await User.findOne({
         $or: [
           { _id: user ? user._id : args.id },
-           { username: args.username }],
+          { username: args.username }],
       });
       return foundUser;
     }
   },
 
   Mutation: {
-    createUser: async (_parent, {username, email, password}) => {
-      const user = await User.create ({username, email, password})
+    async createUser(_parent, { username, email, password }) {
+      const user = await User.create({ username, email, password })
       const token = signToken(user);
 
       return { user, token };
     },
 
-    login: async (_parent, { username, email }) => {
-      const user = await User.findOne({ $or:
-         [{ email }, 
+    async login(_parent, { username, email }) {
+      const user = await User.findOne({
+        $or:
+          [{ email },
           { username }]
-        });
+      });
 
       if (!user) {
         throw new AuthenticationError('No User found!');
@@ -36,27 +38,22 @@ const resolvers = {
       return { token, user };
     },
 
-    saveBook: async (_parent, { username, book }, context) => {
+    async saveBook(_parent, args, context) {
       if (context.user) {
-        return Profile.findOneAndUpdate(
-          { username: username },
-          {
-            $addToSet: { savedBooks: book },
-          },
-          {
-            new: true,
-            runValidators: true,
-          }
+        return await User.findOneAndUpdate(
+          { _id: args.id },
+          { $addToSet: { savedBooks: args.book } },
+          { new: true, runValidators: true }
         );
       }
       throw new AuthenticationError('You need to be logged in!');
     },
 
-    deleteBook: async (_parent, { username, book }, context) => {
+    async deleteBook(_parent, args, context) {
       if (context.user) {
-        return Profile.findOneAndUpdate(
-          { username: username },
-          { $pull: { books: book } },
+        return await User.findOneAndUpdate(
+          { _id: args.id },
+          { $pull: { books: args.book } },
           { new: true }
         );
       }
