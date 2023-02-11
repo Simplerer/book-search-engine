@@ -37,14 +37,10 @@ const resolvers = {
       }
       // password validation
       const token = signToken(user);
-      console.log('create User',user)
-      console.log('create User',token)
       return { token, user };
     },
 
     async saveBook(_parent, args, context) {
-      console.log("ARGAS",args)
-      console.log('CONTEXT', context)
       if (context.user) {
         return await User.findOneAndUpdate(
           { _id: context.user._id },
@@ -56,11 +52,10 @@ const resolvers = {
     },
 
     async deleteBook(_parent, args, context) {
-      console.log(context)
       if (context.user) {
         return await User.findOneAndUpdate(
           { _id: context.user._id },
-          { $pull: { savedBooks: args.bookId } },
+          { $pull: { savedBooks: args } },
           { new: true }
         );
       }
@@ -70,10 +65,5 @@ const resolvers = {
 
 
 }
-
-// context is a session
-
-
-
 
 module.exports = resolvers;
