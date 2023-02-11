@@ -1,6 +1,7 @@
-const { saveBook } = require('../controllers/user-controller');
 const { User } = require('../models');
+const { AuthenticationError } = require('apollo-server-express')
 const { signToken } = require('../utils/auth');
+const { json } = require('express');
 
 const resolvers = {
   Query: { // shorthand for an object method
@@ -19,30 +20,35 @@ const resolvers = {
     async createUser(_parent, { username, email, password }) {
       const user = await User.create({ username, email, password })
       const token = signToken(user);
-
       return { user, token };
     },
 
-    async login(_parent, { username, email }) {
-      const user = await User.findOne({
-        $or:
-          [{ email },
-          { username }]
-      });
+    async login(_parent, { username, email, password }) {
+      const user = await User.findOne({email});
+
+      const correctPw = await user.isCorrectPassword(password);
+
+      if (!correctPw) {
+        throw new AuthenticationError('Incorrect password!');
+      }
 
       if (!user) {
         throw new AuthenticationError('No User found!');
       }
-
+      // password validation
       const token = signToken(user);
+      console.log('create User',user)
+      console.log('create User',token)
       return { token, user };
     },
 
     async saveBook(_parent, args, context) {
+      console.log("ARGAS",args)
+      console.log('CONTEXT', context)
       if (context.user) {
         return await User.findOneAndUpdate(
-          { _id: args.id },
-          { $addToSet: { savedBooks: args.book } },
+          { _id: context.user._id },
+          { $addToSet: { savedBooks: args } },
           { new: true, runValidators: true }
         );
       }
@@ -50,10 +56,11 @@ const resolvers = {
     },
 
     async deleteBook(_parent, args, context) {
+      console.log(context)
       if (context.user) {
         return await User.findOneAndUpdate(
-          { _id: args.id },
-          { $pull: { books: args.book } },
+          { _id: context.user._id },
+          { $pull: { savedBooks: args.bookId } },
           { new: true }
         );
       }
