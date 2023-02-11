@@ -1,11 +1,10 @@
 const { User } = require('../models');
 const { AuthenticationError } = require('apollo-server-express')
 const { signToken } = require('../utils/auth');
-const { json } = require('express');
 
 const resolvers = {
   Query: { // shorthand for an object method
-    async getSingleUser(_parent, args, context) {
+    async me(_parent, args, context) {
       const { user } = context;
       const foundUser = await User.findOne({
         $or: [
@@ -17,13 +16,13 @@ const resolvers = {
   },
 
   Mutation: {
-    async createUser(_parent, { username, email, password }) {
+    async addUser(_parent, { username, email, password }) {
       const user = await User.create({ username, email, password })
       const token = signToken(user);
       return { user, token };
     },
 
-    async login(_parent, { username, email, password }) {
+    async login(_parent, { email, password }) {
       const user = await User.findOne({email});
 
       const correctPw = await user.isCorrectPassword(password);
@@ -51,7 +50,7 @@ const resolvers = {
       throw new AuthenticationError('You need to be logged in!');
     },
 
-    async deleteBook(_parent, args, context) {
+    async removeBook(_parent, args, context) {
       if (context.user) {
         return await User.findOneAndUpdate(
           { _id: context.user._id },

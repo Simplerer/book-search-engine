@@ -13,7 +13,7 @@ import SavedBooks from './pages/SavedBooks';
 import Navbar from './components/Navbar';
 
 const httpLink = createHttpLink({
-  uri: '/graphql', // URL inpoint access for graphql
+  uri: '/graphql', // URL endpoint access for graphql
 });
 
 const authLink = setContext((_, { headers }) => {
@@ -46,10 +46,10 @@ function App() {
             path='/saved'
             element={<SavedBooks />}
           />
-          <Route
+          {/* <Route
             path='*'
             element={<h1 className='display-2'>Wrong page!</h1>}
-          />
+          /> */}
         </Routes>
       </>
     </Router>
