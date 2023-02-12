@@ -2,14 +2,14 @@
 import React, { useState } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
 import { useMutation } from '@apollo/client';
-import { LOGIN } from '../utils/mutations';
+import { LOGIN_USER } from '../utils/mutations';
 import Auth from '../utils/auth';
 
 const LoginForm = () => {
   const [userFormData, setUserFormData] = useState({ email: '', password: '' });
   const [validated] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
-  const [login, { error }] = useMutation(LOGIN);
+  const [loginUser, { error }] = useMutation(LOGIN_USER);
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
@@ -26,18 +26,12 @@ const LoginForm = () => {
     }
 
     try {
-      const { data } = await login({
-        variables: {userFormData}});
+      const { data } = await loginUser({
+        variables: {...userFormData}});
 
-      if (!data) {
-        throw new Error('something went wrong!');
-      }
-
-      const { token, user } = await data
-      console.log(user);
-      Auth.login(token);
-    } catch (err) {
-      console.error(err);
+      Auth.login(data.loginUser.token);
+    } catch (error) {
+      console.error(error);
       setShowAlert(true);
     }
 
@@ -86,6 +80,11 @@ const LoginForm = () => {
           Submit
         </Button>
       </Form>
+      {error && (
+              <div className="my-3 p-3 bg-danger text-white">
+                {error.message}
+              </div>
+            )}
     </>
   );
 };

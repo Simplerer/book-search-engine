@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { Jumbotron, Container, Col, Form, Button, Card, CardColumns } from 'react-bootstrap';
 import { useMutation } from '@apollo/client'
 import { SAVE_BOOK } from '../utils/mutations'
+import { searchGoogleBooks } from '../utils/queries'
 import Auth from '../utils/auth';
 import { saveBookIds, getSavedBookIds } from '../utils/localStorage';
-import { useEffect, useState } from 'react';
 
 const SearchBooks = () => {
   const [searchedBooks, setSearchedBooks] = useState([]);
@@ -94,6 +94,11 @@ const SearchBooks = () => {
           </Form>
         </Container>
       </Jumbotron>
+      {error && (
+              <div className="my-3 p-3 bg-danger text-white">
+                {error.message}
+              </div>
+            )}
 
       <Container>
         <h2>

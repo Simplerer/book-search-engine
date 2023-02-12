@@ -26,15 +26,9 @@ const SignupForm = () => {
 
     try {
       const { data } = await addUser({
-        variables: {userFormData}});
-
-      if (!data) {
-        throw new Error('something went wrong!');
-      }
-
-      const { token, user } = await data
-      console.log(user);
-      Auth.login(token);
+        variables: {...userFormData}});
+        
+      Auth.login(data.addUser.token);
     } catch (err) {
       console.error(err);
       setShowAlert(true);
@@ -99,6 +93,11 @@ const SignupForm = () => {
           Submit
         </Button>
       </Form>
+      {error && (
+              <div className="my-3 p-3 bg-danger text-white">
+                {error.message}
+              </div>
+            )}
     </>
   );
 };

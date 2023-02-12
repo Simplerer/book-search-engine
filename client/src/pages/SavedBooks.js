@@ -43,6 +43,11 @@ const SavedBooks = () => {
             ? `Viewing ${userData.savedBooks.length} saved ${userData.savedBooks.length === 1 ? 'book' : 'books'}:`
             : 'You have no saved books!'}
         </h2>
+        {error && (
+              <div className="my-3 p-3 bg-danger text-white">
+                {error.message}
+              </div>
+            )}
         <CardColumns>
           {userData.savedBooks.map((book) => {
             return (

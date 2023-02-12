@@ -22,7 +22,7 @@ const resolvers = {
       return { user, token };
     },
 
-    async login(_parent, { email, password }) {
+    async loginUser(_parent, { email, password }) {
       const user = await User.findOne({email});
 
       const correctPw = await user.isCorrectPassword(password);
