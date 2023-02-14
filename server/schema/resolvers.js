@@ -36,7 +36,7 @@ const resolvers = {
       }
       // password validation
       const token = signToken(user);
-      return { token, user };
+      return { user, token };
     },
 
     async saveBook(_parent, args, context) {
