@@ -17,11 +17,11 @@ const SavedBooks = () => {
     if (!token) {
       return false;
     }
-    
+
     try {
-        console.log(bookId)
-        await removeBook(bookId);
-        console.log(bookId)
+
+      const { data } = await removeBook({
+        variables: {bookId} });
       removeBookId(bookId);
     } catch (err) {
       console.error(err);
@@ -46,10 +46,10 @@ const SavedBooks = () => {
             : 'You have no saved books!'}
         </h2>
         {error && (
-              <div className="my-3 p-3 bg-danger text-white">
-                {error.message}
-              </div>
-            )}
+          <div className="my-3 p-3 bg-danger text-white">
+            {error.message}
+          </div>
+        )}
         <CardColumns>
           {userData.savedBooks.map((book) => {
             return (
